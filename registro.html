@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro dei Professori</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .form-container input, .form-container button, .form-container select {
+            padding: 10px;
+            margin: 5px 0;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Registro dei Professori</h1>
+    <div class="form-container">
+        <label for="nome">Nome Professore:</label>
+        <input type="text" id="nome" placeholder="Inserisci il nome" required>
+
+        <label for="materia">Materia:</label>
+        <input type="text" id="materia" placeholder="Inserisci la materia" required>
+
+        <label for="voto">Voto:</label>
+        <input type="number" id="voto" min="0" max="10" placeholder="Inserisci il voto" required>
+
+        <button onclick="aggiungiProfessore()">Aggiungi</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome Professore</th>
+                <th>Materia</th>
+                <th>Voto</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody id="registro">
+            <!-- Righe aggiunte dinamicamente qui -->
+        </tbody>
+    </table>
+
+    <script>
+        // Carica i dati salvati dal localStorage
+        window.onload = function() {
+            const registroSalvato = JSON.parse(localStorage.getItem('registroProfessori')) || [];
+            const registro = document.getElementById('registro');
+
+            registroSalvato.forEach(professore => {
+                const nuovaRiga = document.createElement('tr');
+
+                const colonnaNome = document.createElement('td');
+                colonnaNome.textContent = professore.nome;
+                nuovaRiga.appendChild(colonnaNome);
+
+                const colonnaMateria = document.createElement('td');
+                colonnaMateria.textContent = professore.materia;
+                nuovaRiga.appendChild(colonnaMateria);
+
+                const colonnaVoto = document.createElement('td');
+                colonnaVoto.textContent = professore.voto;
+                nuovaRiga.appendChild(colonnaVoto);
+
+                const colonnaAzioni = document.createElement('td');
+                const bottoneRimuovi = document.createElement('button');
+                bottoneRimuovi.textContent = 'Rimuovi';
+                bottoneRimuovi.style.backgroundColor = '#dc3545';
+                bottoneRimuovi.style.color = 'white';
+                bottoneRimuovi.style.border = 'none';
+                bottoneRimuovi.style.padding = '5px 10px';
+                bottoneRimuovi.style.cursor = 'pointer';
+
+                bottoneRimuovi.onclick = function() {
+                    registro.removeChild(nuovaRiga);
+                    salvaRegistro();
+                };
+
+                colonnaAzioni.appendChild(bottoneRimuovi);
+                nuovaRiga.appendChild(colonnaAzioni);
+
+                registro.appendChild(nuovaRiga);
+            });
+        };
+
+        function aggiungiProfessore() {
+            const nome = document.getElementById('nome').value;
+            const materia = document.getElementById('materia').value;
+            const voto = document.getElementById('voto').value;
+
+            if (nome.trim() === '' || materia.trim() === '' || voto === '') {
+                alert('Per favore, compila tutti i campi.');
+                return;
+            }
+
+            const registro = document.getElementById('registro');
+
+            // Crea una nuova riga
+            const nuovaRiga = document.createElement('tr');
+
+            // Colonna Nome
+            const colonnaNome = document.createElement('td');
+            colonnaNome.textContent = nome;
+            nuovaRiga.appendChild(colonnaNome);
+
+            // Colonna Materia
+            const colonnaMateria = document.createElement('td');
+            colonnaMateria.textContent = materia;
+            nuovaRiga.appendChild(colonnaMateria);
+
+            // Colonna Voto
+            const colonnaVoto = document.createElement('td');
+            colonnaVoto.textContent = voto;
+            nuovaRiga.appendChild(colonnaVoto);
+
+            // Colonna Azioni
+            const colonnaAzioni = document.createElement('td');
+            const bottoneRimuovi = document.createElement('button');
+            bottoneRimuovi.textContent = 'Rimuovi';
+            bottoneRimuovi.style.backgroundColor = '#dc3545';
+            bottoneRimuovi.style.color = 'white';
+            bottoneRimuovi.style.border = 'none';
+            bottoneRimuovi.style.padding = '5px 10px';
+            bottoneRimuovi.style.cursor = 'pointer';
+
+            bottoneRimuovi.onclick = function() {
+                registro.removeChild(nuovaRiga);
+                salvaRegistro();
+            };
+
+            colonnaAzioni.appendChild(bottoneRimuovi);
+            nuovaRiga.appendChild(colonnaAzioni);
+
+            // Aggiungi la riga al registro
+            registro.appendChild(nuovaRiga);
+
+            // Resetta i campi
+            document.getElementById('nome').value = '';
+            document.getElementById('materia').value = '';
+            document.getElementById('voto').value = '';
+
+            salvaRegistro();
+        }
+
+        function salvaRegistro() {
+            const registro = document.getElementById('registro');
+            const righe = registro.querySelectorAll('tr');
+            const registroSalvato = [];
+
+            righe.forEach(riga => {
+                const colonne = riga.querySelectorAll('td');
+                registroSalvato.push({
+                    nome: colonne[0].textContent,
+                    materia: colonne[1].textContent,
+                    voto: colonne[2].textContent
+                });
+            });
+
+            localStorage.setItem('registroProfessori', JSON.stringify(registroSalvato));
+
+        }
+    </script>
+
+</body>
+</html>
